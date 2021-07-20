@@ -4,7 +4,9 @@
 #Matheus Luis Oliveira Silva
 #Thomas Taino
 
-import robo, pista_tela, Teste, Navegador1, Navegador2, Navegador3, Navegador4, Placar
+import os
+from importlib import import_module
+import robo, pista_tela, Placar
 
 desenhar=1
 nPista=1
@@ -13,17 +15,20 @@ pista = []
 p = Placar.Placar()
 
 def setup():
-    global nPista, pista, carros, carro1, carro2
+    global nPista, pista, carro, carros, carro1, carro2
+
     size(1200, 700)
-    global  carro
-    pista_tela.inicializa_pista(pista,nPista)
+    pista_tela.inicializa_pista(pista, nPista)
        
     #Adiciona todos os competidores
+    modules = [module for module in os.listdir(sketchPath()+'/controle')\
+                if '.py' in module and not '__init__' in module]
     carros=[]
-    carros.append(robo.robo(100, 120, [[40,-15],[40,0],[40,15]],nSensores, Navegador1.Navegador1('A')))
-    carros.append(robo.robo(100, 120, [[40,-15],[40,0],[40,15]],nSensores, Navegador2.Navegador2('B')))
-    carros.append(robo.robo(100, 120, [[40,-30],[40,-15],[40,0],[40,15],[40,30]],5, Navegador3.Navegador3('C')))
-    carros.append(robo.robo(100,120,[[40,-15],[40,0],[40,15]],nSensores, Navegador4.Navegador4('D')))
+    for i, module in enumerate(modules):
+        m = import_module('controle.'+ module.strip('.py'))
+        carros.append(robo.robo(100, 120, 
+                      [[40,-15],[40,0],[40,15]],
+                      nSensores, m.Navegador(chr(i+65))))
     
     
 def draw():
